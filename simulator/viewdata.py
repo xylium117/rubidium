@@ -269,7 +269,6 @@ def view_Players():
                     break
             else:
                 print("Not in the list.")
-        print(player_name)
     display_Data(player_name)
 cmd = input("\nEnter 'l' to view Leagues, 't' to view Teams, and 'p' to view Players: ")
 if cmd == 't':
