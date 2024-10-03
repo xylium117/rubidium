@@ -63,7 +63,7 @@ def run():
                 i -= 10
             elif cmd == 'q':
                 break
-        
+
         selected_teams = []
         print("Enter 2 integers corresponding to team indices (1 to {}):".format(len(teams)))
 
