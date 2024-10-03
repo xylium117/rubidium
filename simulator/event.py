@@ -81,19 +81,22 @@ class Event:
 
     def show_event(self, auto, evt):
         commentary = ""
+        shorten = self.player.name.split()[-1]
+        if shorten == "Jr.":
+            shorten = self.player.name
         if self.event == "Goal":
             s = random.choices(["SENSATIONAL GOAL!", "A BRILLIANT STRIKE!", "GOOOOAL!", "WHAT A GOAL!"], [7, 5, 10, 3], k=1)
             if s[0] == "SENSATIONAL GOAL!":
-                commentary = f"{self.minute}' {s[0]} { self.player.name.split()[-1] } leaves the keeper flummoxed! {self.side.name} fans are enjoying every moment of this!"
+                commentary = f"{self.minute}' {s[0]} { shorten } leaves the keeper flummoxed! {self.side.name} fans are enjoying every moment of this!"
             elif s[0] == "A BRILLIANT STRIKE!":
                 t = random.choices(["perfect volley", "blazing shot from distance", "perfect knuckle-ball" ])
                 commentary = f"{self.minute}' {s[0]} {self.player.name} hits a {t[0]}! The keeper could do nothing about it. {self.side.name} are having a field day!"
             elif s[0] == "GOOOOAL!":
                 t = random.choices(["composed finish", "tap-in", "header", "1v1"])
                 if t[0] == "1v1":
-                    commentary = f"{self.minute}' {s[0]} {self.player.name.split()[-1] } beats the keeper and finds the net for {self.side.name} "
+                    commentary = f"{self.minute}' {s[0]} { shorten } beats the keeper and finds the net for {self.side.name} "
                 else:
-                    commentary = f"{self.minute}' {s[0]} {self.player.name.split()[-1] } scores for {self.side.name} in a {t[0]}"
+                    commentary = f"{self.minute}' {s[0]} { shorten } scores for {self.side.name} in a {t[0]}"
             elif s[0] == "WHAT A GOAL!":
                 t = random.choices(["overhead kick", "volley", "diving header", "rabona", "backheel flick", "lob"])
                 t1 = random.choices(["ext", "amaz", "pass", "impr", "sup"])
@@ -106,7 +109,7 @@ class Event:
                 elif t1[0] == "impr":
                     commentary = f"{self.minute}' {s[0]} The timing, the precision – just immaculate from {self.player.name}! A perfect {t[0]}, and the keeper had no chance. That’s a goal for the highlight reel!"
                 elif t1[0] == "sup":
-                    commentary = f"{self.minute}' {s[0]} I don't believe it! { self.player.name.split()[-1] }'s pulled off a {t[0]} from nowhere! An audacious finish, and it’s hit the back of the net! Jubiliation from the {self.side.name} fans!"
+                    commentary = f"{self.minute}' {s[0]} I don't believe it! { shorten }'s pulled off a {t[0]} from nowhere! An audacious finish, and it’s hit the back of the net! Jubiliation from the {self.side.name} fans!"
             self.player.motm += 5
             self.player.pots += 5
             self.player.goals += 1
@@ -116,11 +119,11 @@ class Event:
         elif self.event == "On target":
             t = random.choice([1, 2, 3])
             if t == 1:
-                commentary = f"{self.minute}' SHOT! { self.player.name.split()[-1] }’s hit it cleanly for {self.side.name}... and the keeper is forced into action!"
+                commentary = f"{self.minute}' SHOT! { shorten }’s hit it cleanly for {self.side.name}... and the keeper is forced into action!"
             elif t == 2:
                 commentary = f"{self.minute}' SHOT! It's heading straight for goal from the shot by {self.player.name}... the goalkeeper must scramble across"
             elif t == 3:
-                commentary = f"{self.minute}' SHOT! {self.player.name.split()[-1]} takes the shot for {self.side.name}!"
+                commentary = f"{self.minute}' SHOT! { shorten } takes the shot for {self.side.name}!"
             if evt:
                 print(Fore.GREEN + Style.BRIGHT + commentary + Style.RESET_ALL)
             self.player.motm += 3
@@ -130,13 +133,13 @@ class Event:
             if t == 1:
                 commentary = f"{self.minute}' SHOT! {self.player.name} fails to hit the target for {self.side.name}. His teammates are disappointed in him, and they are letting him know."
             elif t == 2:
-                commentary = f"{self.minute}' SHOT!  What a chance for {self.side.name}! But {self.player.name.split()[-1]}'s completely miscued that, and it sails way over the bar."
+                commentary = f"{self.minute}' SHOT!  What a chance for {self.side.name}! But { shorten }'s completely miscued that, and it sails way over the bar."
             elif t == 3:
                 commentary = f"{self.minute}' SHOT! {self.player.name} goes for goal for {self.side.name}! But it's well off target"
             elif t == 4:
-                commentary = f"{self.minute}' SHOT! A powerful strike from {self.side.name} by {self.player.name.split()[-1]}, but it's just inches past the post! That was close, but no real danger in the end."
+                commentary = f"{self.minute}' SHOT! A powerful strike from {self.side.name} by { shorten }, but it's just inches past the post! That was close, but no real danger in the end."
             elif t == 5:
-                commentary = f"{self.minute}' SHOT! {self.player.name.split()[-1]}’s lined it up for {self.side.name}, but he's dragged it wide! A missed opportunity there."
+                commentary = f"{self.minute}' SHOT! { shorten }’s lined it up for {self.side.name}, but he's dragged it wide! A missed opportunity there."
             if evt:
                 print(Fore.WHITE + Style.BRIGHT + commentary + Style.RESET_ALL)
         elif self.event == "Saved":
@@ -160,11 +163,11 @@ class Event:
             if t == 1:
                 commentary = f"{self.minute}' BLOCKED! It’s a powerful strike from {self.player.name}, but the defender steps in, and it's blocked! What a crucial intervention!"
             elif t == 2:
-                commentary = f"{self.minute}' BLOCKED! {self.player.name.split()[-1]} lets fly, but it’s deflected off the defender! The block might have saved them there!"
+                commentary = f"{self.minute}' BLOCKED! { shorten } lets fly, but it’s deflected off the defender! The block might have saved them there!"
             elif t == 3:
                 commentary = f"{self.minute}' BLOCKED! A fierce shot from {self.player.name}, but it’s blocked at the last second! The defender throws his body on the line to keep it out!"
             elif t == 4:
-                commentary = f"{self.minute}' BLOCKED! {self.player.name.split()[-1]} pulls the trigger, but it’s deflected off a defender – and the goalkeeper is completely wrong-footed! Lucky escape!"
+                commentary = f"{self.minute}' BLOCKED! { shorten } pulls the trigger, but it’s deflected off a defender – and the goalkeeper is completely wrong-footed! Lucky escape!"
             if evt:
                 print(Fore.BLUE + commentary + Style.RESET_ALL)
             self.player.motm += 1
@@ -172,21 +175,21 @@ class Event:
         elif self.event == "Hit the bar":
                 t = random.choice(["a thunderous shot", "a fantastic effort", "a close call"])
                 t1 = random.choice(["hits the woodwork", "crashes off the bar"])
-                commentary = f"{self.minute}' {self.player.name.split()[-1]} strikes {t} for {self.side.name}, but it {t1}! So close!"
+                commentary = f"{self.minute}' { shorten } strikes {t} for {self.side.name}, but it {t1}! So close!"
                 if evt:
                     print(Fore.RED + commentary + Style.RESET_ALL)
                 self.player.motm += 1
                 self.player.pots += 1
         elif self.event == "Attempt":
-            commentary = f"{self.minute}' SHOT! {self.player.name.split()[-1]} attempts a shot for {self.side.name}. This might give them an advantage!"
+            commentary = f"{self.minute}' SHOT! { shorten } attempts a shot for {self.side.name}. This might give them an advantage!"
             if evt:
                 print(Fore.GREEN + Style.DIM + commentary + Style.RESET_ALL)
         elif self.event == "Corner":
-            commentary = f"{self.minute}' {self.side.name} has won a corner! {self.player.name.split()[-1]} will take it. This could be dangerous!"
+            commentary = f"{self.minute}' {self.side.name} has won a corner! { shorten } will take it. This could be dangerous!"
             if evt:
                 print(Fore.CYAN + Style.DIM + commentary + Style.RESET_ALL)
         elif self.event == "Failed through ball":
-            commentary = f"{self.minute}' {self.player.name.split()[-1]} tries a through ball, but it's intercepted! {self.side.name} can't find a way through!"
+            commentary = f"{self.minute}' { shorten } tries a through ball, but it's intercepted! {self.side.name} can't find a way through!"
             if evt:
                 print(Fore.LIGHTCYAN_EX + Style.BRIGHT + commentary + Style.RESET_ALL)
         elif self.event == "Foul":
@@ -194,13 +197,13 @@ class Event:
             if evt:
                 print(Fore.WHITE + Style.BRIGHT + commentary + Style.RESET_ALL)
         elif self.event == "Free kick won":
-            commentary = f"{self.minute}' {self.player.name.split()[-1]} wins a free kick for {self.side.name}. This could be a good opportunity!"
+            commentary = f"{self.minute}' { shorten } wins a free kick for {self.side.name}. This could be a good opportunity!"
             if evt:
                 print(Fore.LIGHTCYAN_EX + Style.DIM +  commentary + Style.RESET_ALL)
             self.player.motm += 1
             self.player.pots += 1
         elif self.event == "Hand ball":
-            commentary = f"{self.minute}' Handball! {self.player.name.split()[-1]} is penalized for a handball. Free kick awarded to the opposition."
+            commentary = f"{self.minute}' Handball! { shorten } is penalized for a handball. Free kick awarded to the opposition."
             if evt:
                 print(Fore.YELLOW + Style.DIM + commentary + Style.RESET_ALL)
         elif self.event == "Key Pass":
@@ -212,7 +215,7 @@ class Event:
             self.player.keypasses += 1
             self.player.matchpasses += 1
         elif self.event == "Offside":
-            commentary = f"{self.minute}' OFFSIDE! {self.player.name.split()[-1]} is caught offside! The linesman raises the flag."
+            commentary = f"{self.minute}' OFFSIDE! { shorten } is caught offside! The linesman raises the flag."
             if evt:
                 print(Fore.LIGHTMAGENTA_EX + commentary + Style.RESET_ALL)
         elif self.event == "Own goal":
@@ -222,25 +225,25 @@ class Event:
             self.player.motm -= 3
             self.player.pots -= 3
         elif self.event == "Penalty Conceded":
-            commentary = f"{self.minute}' {self.player.name.split()[-1]} concedes a penalty! A huge moment in the match for {self.side.name}!"
+            commentary = f"{self.minute}' { shorten } concedes a penalty! A huge moment in the match for {self.side.name}!"
             if evt:
                 print(Fore.RED + Style.BRIGHT + commentary + Style.RESET_ALL)
         elif self.event == "Red card":
-            commentary = f"{self.minute}' RED CARD! {self.player.name.split()[-1]} is sent off for {self.side.name}! That could change everything!"
+            commentary = f"{self.minute}' RED CARD! { shorten } is sent off for {self.side.name}! That could change everything!"
             if evt:
                 print(Fore.LIGHTRED_EX + Style.BRIGHT + commentary + Style.RESET_ALL)
             self.player.motm -= 2
             self.player.pots -= 2
             self.player.red += 1
         elif self.event == "Second yellow card":
-            commentary = f"{self.minute}' SECOND YELLOW CARD! {self.player.name.split()[-1]} is given his marching orders! A foolish mistake for {self.side.name}!"
+            commentary = f"{self.minute}' SECOND YELLOW CARD! { shorten } is given his marching orders! A foolish mistake for {self.side.name}!"
             if evt:
                 print(Fore.LIGHTYELLOW_EX + Style.BRIGHT + commentary + Style.RESET_ALL)
             self.player.motm -= 2
             self.player.pots -= 2
             self.player.red += 1
         elif self.event == "Yellow card":
-            commentary = f"{self.minute}' YELLOW CARD!  {self.player.name.split()[-1]} is booked for his first offense! He needs to be careful now for {self.side.name}."
+            commentary = f"{self.minute}' YELLOW CARD! { shorten } is booked for his first offense! He needs to be careful now for {self.side.name}."
             if evt:
                 print(Fore.LIGHTYELLOW_EX + commentary + Style.RESET_ALL)
             self.player.motm -= 1
@@ -251,7 +254,7 @@ class Event:
             if evt:
                 print(Fore.MAGENTA + commentary + Style.RESET_ALL)
         elif self.event == "Sending off":
-            commentary = f"{self.minute}' {self.player.name.split()[-1]} is given his marching orders! A foolish mistake for {self.side.name}!"
+            commentary = f"{self.minute}' { shorten } is given his marching orders! A foolish mistake for {self.side.name}!"
             if evt:
                 print(Fore.LIGHTRED_EX + Style.BRIGHT + commentary + Style.RESET_ALL)
             self.player.motm -= 2
