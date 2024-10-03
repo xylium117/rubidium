@@ -1,6 +1,6 @@
 import random
 
-import simulator.configs.manager as scm
+import configs.manager as scm
 
 
 class Manager:
