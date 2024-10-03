@@ -50,9 +50,20 @@ def run():
                  + League(4).team_names + League(5).team_names)
         sl = range(1, len(teams) + 1)
         table = zip(sl, teams)
-        print(
-            tabulate(table, headers=["", "Club"], tablefmt="rounded_outline")
-        )
+        data = list(map(list, table))
+        i = 0
+        while i <= 90:
+            print(
+                tabulate(data[i : i + 10], headers=["", "Club"], tablefmt="rounded_outline")
+            )
+            cmd = input("\nEnter 'n' for next page, 'p' for previous page, or 'q' to quit: ").strip().lower()
+            if cmd == 'n' and i <= 90:
+                i += 10
+            elif cmd == 'p' and i >= 10:
+                i -= 10
+            elif cmd == 'q':
+                break
+        
         selected_teams = []
         print("Enter 2 integers corresponding to team indices (1 to {}):".format(len(teams)))
 
