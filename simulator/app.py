@@ -1,13 +1,25 @@
 from tabulate import tabulate
 import pandas as pd
 from fuzzywuzzy import process
+from colorama import Fore, Back, Style
 import numpy as np
 
 import time as time
 from league import League
 from team import Team
 from match import Match
-welcome_message = """
+title = """
+
+.______       __    __  .______    __   _______   __   __    __  .___  ___. 
+|   _  \\     |  |  |  | |   _  \\  |  | |       \\ |  | |  |  |  | |   \\/   | 
+|  |_)  |    |  |  |  | |  |_)  | |  | |  .--.  ||  | |  |  |  | |  \\  /  | 
+|      /     |  |  |  | |   _  <  |  | |  |  |  ||  | |  |  |  | |  |\\/|  | 
+|  |\\  \\----.|  `--'  | |  |_)  | |  | |  '--'  ||  | |  `--'  | |  |  |  | 
+| _| `._____| \\______/  |______/  |__| |_______/ |__|  \\______/  |__|  |__| 
+                                                                            
+
+"""
+welcome_message = """                                                    
 Welcome to the League Simulator!
 You can use this project to simulate Football Leagues across the world
 Please enter the league you would like to simulate:
@@ -81,6 +93,8 @@ def teamInput(val, concat):
                 print("Not in the list.")
 
 def run():
+    print(Style.BRIGHT + title + Style.RESET_ALL)
+    time.sleep(3)
     print(welcome_message)
     league_no = get_league_input()
     sel = []
