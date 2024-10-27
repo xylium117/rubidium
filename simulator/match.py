@@ -41,11 +41,24 @@ class Match:
         self.set_odds()
         self.set_events(home_side, away_side)
         self.auto = auto
-        self.redcard = []
-        self.yellowcard = []
+        self.redcard.clear()
+        self.yellowcard.clear()
         self.evt = evt
         self.hscore = 0
         self.ascore = 0
+
+    def bar(self, a, b):
+        total = a + b
+        if a == 0 and b == 0:
+            total = 50
+            a = 25
+        if total == 0:  # Prevent division by zero
+            al = 0
+            bl = 50
+        else:
+            al = int(50 * (a / total))
+            bl = 50 - al
+        return f"[{'█' * al}{'░' * bl}]"
 
     def set_odds(self):
         hdf = (self.home_side.defence ** 2 * self.home_side.midfield) / (
@@ -70,7 +83,13 @@ class Match:
                         self.track_event(e)
                 elif e.event == "Red card" or e.event == "Sending off" or e.event == "Second yellow card":
                     self.redcard.append(e.player.name)
-
+                    self.yellowcard.clear()
+                elif e.event == "Yellow card" and e.player.name not in self.yellowcard:
+                    self.yellowcard.append(e.player.name)
+                elif e.event == "Yellow card" and e.player.name in self.yellowcard:
+                    e.event = "Second yellow card"
+                    print("########################################################################")
+                    self.redcard.append(e.player.name)
                 else:
                     self.track_event(e)
 
@@ -124,6 +143,16 @@ class Match:
         shotB = 0
         posA = self.home_side.midfield ** 0.2 * self.home_side.attack
         posB = self.away_side.midfield ** 0.2 * self.away_side.attack
+        savesA = 0
+        savesB = 0
+        yellowA = 0
+        yellowB = 0
+        redA = 0
+        redB = 0
+        offsideA = 0
+        offsideB = 0
+        cornerA = 0
+        cornerB = 0
         self.home_goals = self.stats[self.home_side]["Goal"]
         self.away_goals = self.stats[self.away_side]["Goal"]
         if self.home_goals > self.away_goals:
@@ -154,12 +183,18 @@ class Match:
                 elif event.event == "Saved":
                     event_data.append([event.player.name + " (" + event.event.upper() + ")", timestamp, ""])
                     onTargetB += 1
-                elif event.event == "Yellow Card":
+                    savesB += 1
+                elif event.event == "Yellow card":
                     event_data.append([event.player.name + " (" + event.event.upper() + ")", timestamp, ""])
-                elif event.event == "Red Card":
+                    yellowA += 1
+                elif event.event == "Red card" or event.event == "Sending off" or event.event == "Second yellow card":
                     event_data.append([event.player.name + " (RED CARD)", timestamp, ""])
+                    redA += 1
                 elif event.event == "Offside":
                     event_data.append([event.player.name + " (" + event.event.upper() + ")", timestamp, ""])
+                    offsideA += 1
+                elif event.event == "Corner":
+                    cornerA += 1
                 elif event.event == "On Target":
                     onTargetA += 1
                 elif event.event == "Blocked":
@@ -167,7 +202,7 @@ class Match:
                 elif event.event == "Attempt":
                     shotA += 1
                 elif event.event == "Key Pass" or event.event == "Free kick won" or event.event == "Corner":
-                    posA += 35
+                    posA += 35 + random.choice([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5])
             elif event.side == self.away_side:  # Player B is left aligned
                 if event.event == "Goal":
                     event_data.append(["", timestamp, event.player.name + " (" + event.event.upper() + ")"])
@@ -175,15 +210,21 @@ class Match:
                 elif event.event == "Own goal":
                     event_data.append([event.player.name + " (O.G)", timestamp, ""])
                     self.home_goals += 1
+                elif event.event == "Corner":
+                    cornerB += 1
                 elif event.event == "Saved":
                     event_data.append(["", timestamp, event.player.name + " (" + event.event.upper() + ")"])
                     onTargetA += 1
-                elif event.event == "Yellow Card":
+                    savesA += 1
+                elif event.event == "Yellow card":
                     event_data.append(["", timestamp, event.player.name + " (" + event.event.upper() + ")"])
-                elif event.event == "Red Card":
+                    yellowB += 1
+                elif event.event == "Red card" or event.event == "Sending off" or event.event == "Second yellow card":
                     event_data.append(["", timestamp, event.player.name + " (RED CARD) "])
+                    redB += 1
                 elif event.event == "Offside":
                     event_data.append(["", timestamp, event.player.name + " (" + event.event.upper() + ")"])
+                    offsideB += 1
                 elif event.event == "On Target":
                     onTargetB += 1
                 elif event.event == "Attempt":
@@ -200,31 +241,18 @@ class Match:
                        headers=[self.home_side.name.upper(), f"{self.home_goals}  -  {self.away_goals}", self.away_side.name.upper()]))
         self.hscore = self.home_goals
         self.ascore = self.away_goals
-        total = pA + pB
-        if total == 0:  # Prevent division by zero
-            teamA_length = 0
-            teamB_length = 30
-        else:
-            teamA_length = int(30 * (pA / total))
-            teamB_length = 30 - teamA_length
-        possession_bar = f"[{'█' * teamA_length}{'░' * teamB_length}]"
-
-        total = shotA + shotB
-        if total == 0:  # Prevent division by zero
-            teamA_length = 0
-            teamB_length = 30
-        else:
-            teamA_length = int(30 * (shotA / total))
-            teamB_length = 30 - teamA_length
-        shots_bar = f"[{'█' * teamA_length}{'░' * teamB_length}]"
         # display stats
         stats = [
-            [f"Possession: {pA}", possession_bar, f"{pB}"],
-            [f"Shots: {shotA}({onTargetA})", shots_bar, f"{shotB}({onTargetB})"]
+            ["Possession", f"{pA}", self.bar(pA, pB), f"{pB}"],
+            ["Attempts (On Target)", f"{shotA}({onTargetA})", self.bar(shotA + onTargetA, shotB + onTargetB), f"{shotB}({onTargetB})"],
+            ["Saves", f"{savesA}", self.bar(savesA, savesB), f"{savesB}"],
+            ["Offsides", f"{offsideA}", self.bar(offsideA, offsideB), f"{offsideB}"],
+            ["Corners", f"{cornerA}", self.bar(cornerA, cornerB), f"{cornerB}"],
+            ["Yellow Cards/Red Cards", f"{yellowA}/{redA}", self.bar(yellowA + redA, yellowB + redB), f"{yellowB}/{redB}"],
         ]
 
         # Print the stats section
-        print(tabulate(stats, tablefmt="plain", numalign="center", stralign="center", showindex=False, headers=[self.home_side.name.upper(), f"{self.home_goals}  -  {self.away_goals}", self.away_side.name.upper()]))
+        print(tabulate(stats, tablefmt="plain", numalign="center", stralign="center", showindex=False, headers=["", self.home_side.name.upper(), f"{self.home_goals}  -  {self.away_goals}", self.away_side.name.upper()]))
         # MOTM logic
         home_players = list(self.home_players.values())
         away_players = list(self.away_players.values())
@@ -280,5 +308,5 @@ class Match:
             player.matchgoals = 0
             player.matchsaves = 0
             player.matchpasses = 0
-        self.redcard = [] # reset tally
-        self.yellowcard = [] # reset tally
+        self.redcard.clear() # reset tally
+        self.yellowcard.clear() # reset tally
