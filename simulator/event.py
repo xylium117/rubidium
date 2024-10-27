@@ -18,15 +18,34 @@ class Event:
         self.reverse = {home_side: away_side, away_side: home_side}
 
     def set_player_for_events(self, eventslist):
-        position = random.choice(
+        attack = random.choice(
             ["defenders", "defenders", "defenders", "midfielders", "midfielders", "midfielders", "midfielders", "midfielders", "attackers", "attackers", "attackers", "attackers", "attackers", "attackers"]
         )
-        players = list(eventslist[0].side.squad[position])
-        player = random.choice(players)
+        card = random.choice(
+            ["defenders", "defenders", "defenders", "defenders", "defenders", "defenders", "midfielders", "midfielders", "midfielders", "attackers"]
+        )
+        assist = random.choice(
+            ["midfielders", "midfielders", "midfielders", "midfielders", "midfielders", "attackers", "attackers", "attackers", "defenders", "defenders"]
+        )
+        equal = random.choice(
+            ["midfielders", "midfielders", "midfielders", "defenders", "defenders", "defenders", "attackers", "attackers", "attackers"]
+        )
+        def_players = list(eventslist[0].side.squad[card])
+        atk_players = list(eventslist[0].side.squad[attack])
+        mid_players = list(eventslist[0].side.squad[assist])
+        base_players = list(eventslist[0].side.squad[equal])
+        player = random.choice(base_players)
         for e in eventslist:
-            e.player = player
-            if e.event == "Saved":
+            if e.event == "Red card" or e.event == "Second yellow card" or e.event == "Yellow card" or e.event == "Blocked" or e.event == "Sending off" or e.event == "Foul":
+                e.player = random.choice(def_players)
+            elif e.event == "Goal" or e.event == "Attempt" or e.event == "Offside":
+                e.player = random.choice(atk_players)
+            elif e.event == "Corner" or e.event == "Failed through ball" or e.event == "Free kick won" or e.event == "Key Pass":
+                e.player = random.choice(mid_players)
+            elif e.event == "Saved":
                 e.player = e.side.squad["goalkeeper"][0]
+            else:
+                e.player = player
         return eventslist
 
     def evaluate_event(self):
