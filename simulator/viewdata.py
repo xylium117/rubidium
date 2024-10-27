@@ -5,7 +5,9 @@ from colorama import Fore, Back, Style
 from tabulate import tabulate
 from fuzzywuzzy import process
 
-df_players_data = pd.read_pickle("data/player_data")
+df_players_data = pd.read_pickle("data/player_data2")
+all_teams = [x for x in sorted([str(team) for team in df_players_data["club"].unique()[3:-1]]) if x != "nan"]
+concat = ["Icon", "Wonderkids", "Legends", "Hero"] + all_teams
 
 def abbr(value):
     if value >= 1_000_000_000:
@@ -92,20 +94,19 @@ def view_Team():
         if viewAll == 'y':
             data = []
             n = 1
-            for league_info in cfgl.leagues.values():
-                for team in league_info["teams"]:
-                    data.append([f"{Fore.LIGHTBLUE_EX}{n}.{Style.RESET_ALL}", f"{Fore.LIGHTCYAN_EX}{Style.BRIGHT}{team}{Style.RESET_ALL}"])
-                    n += 1
+            for team in concat:
+                data.append([f"{Fore.LIGHTBLUE_EX}{n}.{Style.RESET_ALL}", f"{Fore.LIGHTCYAN_EX}{Style.BRIGHT}{team}{Style.RESET_ALL}"])
+                n += 1
             i = 0
-            while i <= 90:
+            while i <= 670:
                 print(
-                    tabulate(data[i: i + 10], tablefmt="plain")
+                    tabulate(data[i: i + 15], tablefmt="plain")
                 )
                 cmd = input("\nEnter 'n' for next page, 'p' for previous page, or 'q' to quit: ").strip().lower()
-                if cmd == 'n' and i <= 90:
-                    i += 10
-                elif cmd == 'p' and i >= 10:
-                    i -= 10
+                if cmd == 'n' and i <= 670:
+                    i += 15
+                elif cmd == 'p' and i >= 15:
+                    i -= 15
                 elif cmd == 'q':
                     flag = False
                     break
@@ -113,7 +114,29 @@ def view_Team():
             break
 
     while True:
-        clubname = input("\nEnter the name of a club: ")
+        clubname = ""
+        while True:
+            clubname = input("\nEnter the name of a club (type 'exit' to quit): ")
+            if clubname.lower() == 'exit':
+                exit()
+            if clubname in concat:
+                print(f"You selected: {clubname}")
+                clubname = clubname
+                break
+            else:
+                matches = process.extract(clubname, concat, limit=5)
+                acc = [match for match, score in matches if score >= 70]
+                if acc:
+                    if len(acc) > 1:
+                        print("Did you mean one of the following clubs?")
+                        for club in acc:
+                            print(f"- {club}")
+                    else:
+                        print(f"You selected: {acc[0]}")
+                        clubname = acc[0]
+                        break
+                else:
+                    print("Not in the list.")
         df_team_players_data = df_players_data[df_players_data["club"] == clubname]
         if not df_team_players_data.empty:
             print(clubname.upper())
@@ -125,6 +148,8 @@ def view_Team():
                 table_data.append([sn, ln])
 
             print(tabulate(table_data, tablefmt="plain"))
+        elif clubname.strip().lower() == 'exit':
+            exit()
         else:
             print("Club name not found!")
 
@@ -137,6 +162,8 @@ def view_League():
 
 def view_Players():
     all_players = df_players_data["short_name"].tolist()
+    all_teams = [x for x in sorted([str(team) for team in df_players_data["club"].unique()[3:-1]]) if x != "nan"]
+    concat = ["Icon", "Wonderkids", "Legends", "Hero"] + all_teams
     while True:
         inp = input("\nSearch by Player Name? (y/n): ").strip().lower()
         if inp == "y":
@@ -164,112 +191,71 @@ def view_Players():
                         print("Not in the list.")
             display_Data(player_name)
         elif inp == "n":
-                break
-    print(f"{Fore.LIGHTRED_EX}{Style.BRIGHT}Premier League\nLaLiga\nBundesliga\nSerie A\nLigue 1\nCustom{Style.RESET_ALL}")
-
-    leagues = ["Premier League", "LaLiga", "Bundesliga", "Serie A", "Ligue 1", "Custom"]
-    league_name = ""
-    while True:
-        league_name = input("League (type 'exit' to quit): ")
-        if league_name.lower() == 'exit':
-            exit()
-        if league_name in leagues:
-            print(f"You selected: {league_name}")
-            break
-        else:
-            matches = process.extract(league_name, leagues, limit=3)
-            acc = [match for match, score in matches if score >= 60]
-            if acc:
-                if len(acc) > 1:
-                    print("Did you mean one of the following leagues?")
-                    for league in acc:
-                        print(f"- {league}")
-                else:
-                    print(f"You selected: {acc[0]}")
-                    league_name = acc[0]
+            team_name = ""
+            while True:
+                team_name = input("Club (type 'exit' to quit): ")
+                if team_name.lower() == 'exit':
+                    exit()
+                if team_name in concat:
+                    print(f"You selected: {team_name}")
+                    team_name = team_name
                     break
-            else:
-                print("Not in the list.")
-    country = ""
-    if league_name == "LaLiga":
-        country = "spain"
-    elif league_name == "Premier League":
-        country = "england"
-    elif league_name == "Bundesliga":
-        country = "germany"
-    elif league_name == "Serie A":
-        country = "italy"
-    elif league_name == "Ligue 1":
-        country = "france"
-    elif league_name == "Custom":
-        country = "special"
-    league_info = cfgl.leagues[country]
-    print(f"\n{Fore.LIGHTRED_EX}{Style.BRIGHT}{league_info['name']}:{Style.RESET_ALL}")
-    league_data = []
-    for team in league_info["teams"]:
-        print(f"- {Fore.LIGHTYELLOW_EX}{Style.BRIGHT}{team}{Style.RESET_ALL}")
-        league_data.append(team)
-
-    team_name = ""
-    while True:
-        team_name = input("Club (type 'exit' to quit): ")
-        if team_name.lower() == 'exit':
-            exit()
-        if team_name in league_data:
-            print(f"You selected: {team_name}")
-            break
-        else:
-            matches = process.extract(team_name, league_data, limit=3)
-            acc = [match for match, score in matches if score >= 60]
-            if acc:
-                if len(acc) > 1:
-                    print("Did you mean one of the following clubs?")
-                    for club in acc:
-                        print(f"- {club}")
                 else:
-                    print(f"You selected: {acc[0]}")
-                    team_name = acc[0]
+                    matches = process.extract(team_name, concat, limit=5)
+                    acc = [match for match, score in matches if score >= 70]
+                    if acc:
+                        if len(acc) > 1:
+                            print("Did you mean one of the following clubs?")
+                            for club in acc:
+                                print(f"- {club}")
+                        else:
+                            print(f"You selected: {acc[0]}")
+                            team_name = acc[0]
+                            break
+                    else:
+                        print("Not in the list.")
+            print()
+            df_team_players_data = df_players_data[df_players_data["club"] == team_name]
+            players = []
+            if not df_team_players_data.empty:
+                print(team_name.upper())
+                table_data = []
+
+                for index, df_player in df_team_players_data.iterrows():
+                    ln = f"{Fore.LIGHTYELLOW_EX}{df_player['long_name']}{Style.RESET_ALL}"
+                    sn = f"{Fore.LIGHTGREEN_EX}{df_player['short_name']}{Style.RESET_ALL}"
+                    players.append(df_player['short_name'])
+                    table_data.append([sn, ln])
+
+                print(tabulate(table_data, tablefmt="plain"))
+            print()
+            player_name = ""
+            while True:
+                player_name = input("Player (type 'exit' to quit): ")
+                if player_name.lower() == 'exit':
+                    exit()
+                if player_name in players:
+                    print(f"You selected: {player_name}")
                     break
-            else:
-                print("Not in the list.")
-    print()
-    df_team_players_data = df_players_data[df_players_data["club"] == team_name]
-    players = []
-    if not df_team_players_data.empty:
-        print(team_name.upper())
-        table_data = []
-
-        for index, df_player in df_team_players_data.iterrows():
-            ln = f"{Fore.LIGHTYELLOW_EX}{df_player['long_name']}{Style.RESET_ALL}"
-            sn = f"{Fore.LIGHTGREEN_EX}{df_player['short_name']}{Style.RESET_ALL}"
-            players.append(df_player['short_name'])
-            table_data.append([sn, ln])
-
-        print(tabulate(table_data, tablefmt="plain"))
-    print()
-    player_name = ""
-    while True:
-        player_name = input("Player (type 'exit' to quit): ")
-        if player_name.lower() == 'exit':
-            exit()
-        if player_name in players:
-            print(f"You selected: {player_name}")
-            break
-        else:
-            matches = process.extract(player_name, players, limit=3)
-            acc = [match for match, score in matches if score >= 60]
-            if acc:
-                if len(acc) > 1:
-                    print("Did you mean one of the following players?")
-                    for player in acc:
-                        print(f"- {player}")
                 else:
-                    print(f"You selected: {acc[0]}")
-                    player_name = f"{acc[0]}"
-                    break
-            else:
-                print("Not in the list.")
-    display_Data(player_name)
+                    matches = process.extract(player_name, players, limit=3)
+                    acc = [match for match, score in matches if score >= 60]
+                    if acc:
+                        if len(acc) > 1:
+                            print("Did you mean one of the following players?")
+                            for player in acc:
+                                print(f"- {player}")
+                        else:
+                            print(f"You selected: {acc[0]}")
+                            player_name = f"{acc[0]}"
+                            break
+                    else:
+                        print("Not in the list.")
+                print(player_name)
+            display_Data(player_name)
+
+
+
 cmd = input("\nEnter 'l' to view Leagues, 't' to view Teams, and 'p' to view Players: ")
 if cmd == 't':
     view_Team()
