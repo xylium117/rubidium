@@ -70,9 +70,9 @@ Contributions are welcome! If you have any improvements, bug fixes, or new proje
 - [x] Add preliminary data visualization
 - [x] Improve UI and UX
 - [x] Add viewall.py script
-- [ ] Implement fuzzy matching to improve UX
-- [ ] Add more Leagues and update player roster
-- [ ] Finalise data visualisation and viewall.py script=
+- [x] Implement fuzzy matching to improve UX
+- [x] Add more Leagues and update player roster
+- [ ] Finalise data visualisation and viewall.py script
 - [ ] Improve Match mechanics (Yellow Cards, Substitutions)
 - [ ] Player stats dump and career regression
 - [ ] Implement tournaments
