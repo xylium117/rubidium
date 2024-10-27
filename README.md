@@ -49,6 +49,12 @@ Execute the program
 python simulator
 ```
 
+View all data
+```bash
+cd simulator
+python viewdata.py
+```
+
 ### Prerequisites 📋
 
 To run Rubidium, [Python](https://www.python.org/ftp/python/3.12.6/python-3.12.6-amd64.exe) must be downloaded. An IDE is also suggested if you want to contribute to the code. 🏗️
