@@ -1,4 +1,7 @@
 from tabulate import tabulate
+import pandas as pd
+from fuzzywuzzy import process
+import numpy as np
 
 import time as time
 from league import League
@@ -11,30 +14,77 @@ Please enter the league you would like to simulate:
 """
 
 leagues_message = """
-1 - LaLiga 
-2 - Premier League
+1 - Premier League
+2 - LaLiga 
 3 - Bundesliga
 4 - Seria A
 5 - Ligue 1
-6 - Icons, Legends, Wonderkids
-7 - Club Friendly
+6 - Liga Portugal
+7 - Jupiler Pro League (Belgium)
+8 - Major League Soccer
+9 - 3F Superliga
+10 - Eredvisie
+11 - Liga Profesional
+12 - EFL Championship
+13 - Süper Lig
+14 - Admiral Bundesliga (Austria)
+15 - LaLiga 2
+16 - Swiss Super League
+17 - Ekstraklasa
+18 - 2. Bundesliga
+19 - Serie B
+20 - K-League 1
+21 - Allsvenskan
+22 - Eliteserien
+23 - Saudi Pro League
+24 - Ligue 2
+25 - cinch Premiership
+26 - Chinese Super League
+27 - Indian Super League
+28 - Icons, Legends, Wonderkids
+29 - Club Friendly
 """
 
+df = pd.read_pickle("simulator/data/player_data2")
+all_teams = [x for x in sorted([str(team) for team in df["club"].unique()[3:-1]]) if x != "nan"]
 
 def get_league_input():
     try:
         num = int(input(leagues_message))
-        assert num in [1, 2, 3, 4, 5, 6, 7]
+        assert num in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                       18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
         return num
     except (ValueError, AssertionError):
         print('Please enter a valid input!')
         get_league_input()
 
+def teamInput(val, concat):
+    while True:
+        team = input(f"Enter Team {val} (type 'exit' to quit): ")
+        if team.lower() == 'exit':
+            exit()
+        if team in concat:
+            print(f"You selected: {team}")
+            return team
+        else:
+            matches = process.extract(team, concat, limit=3)
+            acc = [match for match, score in matches if score >= 70]
+            if acc:
+                if len(acc) > 1:
+                    print("Did you mean one of the following clubs?")
+                    for club in acc:
+                        print(f"- {club}")
+                else:
+                    print(f"You selected: {acc[0]}")
+                    return acc[0]
+            else:
+                print("Not in the list.")
 
 def run():
     print(welcome_message)
     league_no = get_league_input()
-    if league_no < 7:
+    sel = []
+    if league_no < 29:
         league = League(league_no)
         while True:
             user_input = input("Do you wish to see match events? (y/n): ").strip().lower()
@@ -46,47 +96,42 @@ def run():
                 league.simulate_league(evt=False)
                 break
     else:
-        teams = (League(6).team_names + League(1).team_names + League(2).team_names + League(3).team_names
-                 + League(4).team_names + League(5).team_names)
-        sl = range(1, len(teams) + 1)
-        table = zip(sl, teams)
-        data = list(map(list, table))
+        all_teams_leagues = []
+
+        for club in all_teams:
+            league = df.loc[df['club'] == club, 'league'].values[0]  # Get the league for the current club
+            all_teams_leagues.append([club, league])
+        _add = zip(["Icon", "Wonderkids", "Legends", "Hero"], ["Special", "Special", "Special", "Special"])
+        concat = list(_add) + list(all_teams_leagues)
+        _table = [list(tup) for tup in concat]
+        data = [[i + 1] + sublist for i, sublist in enumerate(_table)]
         i = 0
-        while i <= 90:
+        while i <= 700 - 30:
             print(
-                tabulate(data[i : i + 10], headers=["", "Club"], tablefmt="rounded_outline")
+                tabulate(data[i : i + 15], headers=["", "Club", "League"], tablefmt="rounded_outline")
             )
             cmd = input("\nEnter 'n' for next page, 'p' for previous page, or 'q' to quit: ").strip().lower()
-            if cmd == 'n' and i <= 90:
-                i += 10
-            elif cmd == 'p' and i >= 10:
-                i -= 10
+            if cmd == 'n' and i <= 700 - 30:
+                i += 15
+            elif cmd == 'p' and i >= 15:
+                i -= 15
             elif cmd == 'q':
                 break
 
-        selected_teams = []
-        print("Enter 2 integers corresponding to team indices (1 to {}):".format(len(teams)))
 
-        for i in range(2):
-            while True:
-                try:
-                    index = int(input(f"Enter index for team {i + 1}: ")) - 1  # Adjusting for zero-based indexing
-                    if 0 <= index < len(teams):
-                        selected_teams.append(teams[index])
-                        break  # Exit the loop if the input is valid
-                    else:
-                        print(f"Invalid index. Please enter a number between 1 and {len(teams)}.")
-                except ValueError:
-                    print("Invalid input. Please enter an integer.")
+        team_1 = teamInput(1, concat=["Icon", "Wonderkids", "Legends", "Hero"] + all_teams)
+        team_2 = teamInput(2, concat=["Icon", "Wonderkids", "Legends", "Hero"] + all_teams)
+        sel.append(team_1)
+        sel.append(team_2)
 
-        home_team = Team(selected_teams[0])
-        away_team = Team(selected_teams[1])
+        home_team = Team(sel[0])
+        away_team = Team(sel[1])
 
         h = 0
         a = 0
         print("\n")
         print("LEG 1")
-        print(selected_teams[0].upper() + " VS " + selected_teams[1].upper())
+        print(sel[0].upper() + " VS " + sel[1].upper())
         match = Match(home_team, away_team, False, True)
         match.show_match_result()
         h += match.home_goals
@@ -94,9 +139,10 @@ def run():
         time.sleep(0.5)
         print("\n")
         print("LEG 2")
-        print(selected_teams[1].upper() + " VS " + selected_teams[0].upper())
+        print(sel[1].upper() + " VS " + sel[0].upper())
         match = Match(away_team, home_team, False, True)
         match.show_match_result()
         h += match.away_goals
         a += match.home_goals
-        print(f"{selected_teams[0].upper()} {h} - {a} {selected_teams[1].upper()}")
+        print("\nAGGREGATE SCORE:")
+        print(f"{sel[0].upper()} {h} - {a} {sel[1].upper()}")
