@@ -66,7 +66,6 @@ class League:
             schedule.append(round_schedule)
 
             teams.insert(1, teams.pop())  # Rotate the list
-
         return schedule
 
     def init_league_table(self):
@@ -196,12 +195,12 @@ class League:
             pos.append(player.pos2)
             club.append(player.club)
             goals.append(player.goals)
-            assists.append(round(player.keypasses/2.0))
+            assists.append(round(player.keypasses/8.0))
             saves.append(round(player.saves/2.0))
             yellow.append(round(player.yellow/2.0))
             red.append(player.red)
             motms.append(player.motmscore)
-            motm.append(min((player.pots/100.0) + 2, 9.9 - random.choice([0.1, 0.0, 0.2, 0.1, 0.1, 0.2])))
+            motm.append(min((player.pots/100.0) + 2, 9.9 - random.choice([0.3, 0.3, 0.2, 0.2, 0.1, 0.2, 0.1, 0.2, 0.3, random.randint(3, 6)/10.0, random.randint(3, 6)/10.0, random.randint(3, 6)/10.0, random.randint(3, 6)/10.0, random.randint(3, 6)/10.0, random.randint(3, 6)/10.0])))
         keys = ["Player", "Position", "Club", "Goals", "Assists", "Saves", "Yellow Cards", "Red Cards", "MOTM Awards", "Rating"]
         dict = {
             "Player" : name,
