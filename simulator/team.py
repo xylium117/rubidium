@@ -3,7 +3,7 @@ import pandas as pd
 from manager import Manager
 from player import Player
 
-df_players_data = pd.read_pickle("simulator/data/player_data")
+df_players_data = pd.read_pickle("simulator/data/player_data2")
 
 
 class Team:
