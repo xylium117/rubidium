@@ -8,6 +8,7 @@ An interactive football simulator using FIFA24 (FC24) data and analytics
 
 ---
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)&nbsp;
+![NumPy](https://img.shields.io/badge/Numpy-777BB4?style=for-the-badge&logo=numpy&logoColor=white)&nbsp;
 [![License: MIT](https://img.shields.io/badge/LICENSE-GPL_3.0-green?style=for-the-badge)](https://github.com/xylium117/pavillion/blob/master/LICENSE.md)
 
 
