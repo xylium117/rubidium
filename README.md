@@ -23,6 +23,7 @@ An interactive football simulator using FIFA24 (FC24) data and analytics
 
 ## Getting Started 🚀
 
+Clone the project
 ```bash
 git clone https://github.com/xylium117/rubidium.git
 ```
